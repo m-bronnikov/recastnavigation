@@ -19,6 +19,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
+#include <cassert>
 #include "SDL.h"
 #include "SDL_opengl.h"
 #ifdef __APPLE__
@@ -758,9 +759,15 @@ void Sample_TileMesh::buildAllTiles()
 				// Remove any previous data (navmesh owns and deletes the data).
 				m_navMesh->removeTile(m_navMesh->getTileRefAt(x,y,0),0,0);
 				// Let the navmesh own the data.
-				dtStatus status = m_navMesh->addTile(data,dataSize,DT_TILE_FREE_DATA,0,0);
+
+				dtTileRef addedTyleRef;
+				dtStatus status = m_navMesh->addTile(data,dataSize,DT_TILE_FREE_DATA,0,&addedTyleRef);
 				if (dtStatusFailed(status))
 					dtFree(data);
+				
+				const dtMeshTile* addedTyle = m_navMesh->getTileByRef(addedTyleRef);
+				printf("added links: %p\n", addedTyle->links);
+				assert(reinterpret_cast<uintptr_t>(addedTyle->links) % alignof(dtLink) == 0);
 			}
 		}
 	}
