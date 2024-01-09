@@ -460,12 +460,24 @@ inline unsigned int dtIlog2(unsigned int v)
 	return r;
 }
 
+template <typename Type>
+int dtAlignOf()
+{
+    struct TestType 
+	{
+        Type t;
+        char c;
+    };
+
+    return static_cast<int>(sizeof(TestType) - sizeof(Type));
+};
+
 inline int dtAlign4(int x) { return (x+3) & ~3; }
 
 template <typename TypeToBeAlignedFor>
 int dtAlignForType(int x) 
 { 
-	const int mask = static_cast<int>(alignof(TypeToBeAlignedFor) - 1);
+	const int mask = dtAlignOf<TypeToBeAlignedFor>() - 1;
 	return (x+mask) & ~mask; 
 }
 
